@@ -1,0 +1,167 @@
+npm init -y
+
+npm i express bcryptjs passport passport-local ejs express-ejs-layouts mongoose connect-flash express-session
+
+/* the output
++ passport@0.4.1
++ ejs@3.1.5
++ express-session@1.17.1
++ passport-local@1.0.0
++ express@4.17.1
++ mongoose@5.10.0
++ connect-flash@0.1.1
++ express-ejs-layouts@2.5.0
++ bcryptjs@2.4.3
+added 106 packages from 62 contributors and audited 106 packages in 15.64s
+end of output
+*/
+
+//to constantly watch our files and update it so that we don't have to refresh the server all the time
+npm i -D nodemon
+
+//after this go to your package.json to make some changes
+
+//after running nodemon app.js you will see cannot GET/ response, next you create a folder called routes and create 2 files index.js and users.js
+
+// to test that our application is working:
+<- code for app.js->
+const express = require("express");
+
+const app = express();
+
+//routes
+app.use("/", require("./routes/index"));
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, console.log(`server started on port ${PORT}`));
+<-end of code for app.js->
+
+<-code for index.js->
+
+const express = require("express");
+const router = express.Router();
+
+router.get("/", (req, res) => res.send("welcome"));
+
+module.exports = router;
+<-end of code for index.js->
+
+// when you reload you see the text welcome
+
+// next you copy the code in your index. js and paste in your users.js
+
+//now we have to start with our views. dashboard.ejs, layout.ejs, login.ejs, register.ejs, welcome.ejs and you paste the code accordingly.
+
+//now your app.js code should look like this
+<-code->
+const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
+
+const app = express();
+
+//EJS
+app.use(expressLayouts); //make sure the layout is about otherwise it will not work
+app.set("view engine", "ejs");
+
+//routes
+app.use("/", require("./routes/index"));
+app.use("/users", require("./routes/users"));
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, console.log(`server started on port ${PORT}`));
+<-end of code->
+
+//now your users.js should look like this:<-users.js->
+const express = require("express");
+const router = express.Router();
+
+//Login Page
+router.get("/login", (req, res) => res.render("login"));
+
+//Register page
+router.get("/register", (req, res) => res.render("register"));
+
+module.exports = router;
+<-end of users->
+
+//in the register.js make sure to comment out this -> <% include ./partials/messages %>
+
+//now that our views are taken care of and we close them and move to the app.js
+<-code for app.js->
+const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
+const mongoose = require("mongoose");
+
+const app = express();
+
+//DB Config
+const db = require("./config/keys").MongoURI;
+
+//Connect to Mongo
+mongoose
+  .connect(db, { useNewUrlParser: true })
+  .then(() => console.log("MongoDB Connected..."))
+  .catch((err) => console.log(err));
+
+//EJS
+app.use(expressLayouts); //make sure the layout is about otherwise it will not work
+app.set("view engine", "ejs");
+
+//routes
+app.use("/", require("./routes/index"));
+app.use("/users", require("./routes/users"));
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, console.log(`server started on port ${PORT}`));
+<-end of app.js->
+
+//now you create folder called config and a file called keys.js
+<-code for keys.js->
+module.exports = {
+  MongoURI:
+    "mongodb+srv://admin:admin1234@cluster0.hmy0x.mongodb.net/makeorbreak?retryWrites=true&w=majority",
+};
+
+//now you go to your mongo db atlas and create a cluster and copy the connection string and paste it in your keys.js in config
+<--keys.js-->
+module.exports = {
+  MongoURI:
+    "mongodb+srv://admin:admin1234@cluster0.hmy0x.mongodb.net/makeorbreak?retryWrites=true&w=majority",
+};
+<-end of keys.js->
+
+//now you create a folder called models and a file called User.js
+<-add the code for User.js in models, there is nothing to change->
+//add this code to your app.js//
+
+Body parser
+app.use(express.urlencoded({ extended: false }));
+<-end of code->
+
+// now add your users.js should look like this after adding the new code
+<-users.js->
+const express = require("express");
+const router = express.Router();
+
+//Login Page
+router.get("/login", (req, res) => res.render("login"));
+
+//Register page
+router.get("/register", (req, res) => res.render("register"));
+
+//register handle
+router.post("/register", (req, res) => {
+  console.log(req.body);
+  res.send("hello");
+});
+
+module.exports = router;
+<-end of code->
+
+
+//now you go to your your application and go to register and put in your inputs.
+//after that the inputs you have made will appear in your console.
+
